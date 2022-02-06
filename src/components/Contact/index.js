@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { validateEmail } from "../../utils/helpers";
 
 const ContactForm = () => {
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [formState, setFormState] = useState({
     name: "",
     email: "",
@@ -8,14 +11,33 @@ const ContactForm = () => {
   });
 
   const { name, email, message } = formState;
+
   function handleChange(e) {
-    setFormState({ ...formState, [e.target.name]: e.target.value });
+    if (e.target.name === "email") {
+      const isValid = validateEmail(e.target.value);
+      console.log(isValid);
+      // isValid conditional statement
+      if (!isValid) {
+        setErrorMessage("Your email is invalid.");
+      } else {
+        setErrorMessage("");
+      }
+    } else {
+      if (!e.target.value.length) {
+        setErrorMessage(`${e.target.name} is required.`);
+      } else {
+        setErrorMessage("");
+      }
+    }
+    if (!errorMessage) {
+      setFormState({ ...formState, [e.target.name]: e.target.value });
+    }
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(formState)
-  }
+    console.log(formState);
+  };
 
   return (
     <section>
@@ -26,7 +48,7 @@ const ContactForm = () => {
           <input
             type="text"
             name="name"
-            onChange={handleChange}
+            onBlur={handleChange}
             defaultValue={name}
           />
         </div>
@@ -35,7 +57,7 @@ const ContactForm = () => {
           <input
             type="email"
             name="email"
-            onChange={handleChange}
+            onBlur={handleChange}
             defaultValue={email}
           />
         </div>
@@ -44,10 +66,15 @@ const ContactForm = () => {
           <textarea
             name="message"
             rows="5"
-            onChange={handleChange}
+            onBlur={handleChange}
             defaultValue={message}
           />
         </div>
+        {errorMessage && (
+          <div>
+            <p className="error-text">{errorMessage}</p>
+          </div>
+        )}
         <button type="submit">Submit</button>
       </form>
     </section>
